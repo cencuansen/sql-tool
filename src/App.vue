@@ -118,7 +118,6 @@ const tableRef = ref(null);
 const selectedRows = ref<Column[]>([]);
 
 async function onTableRowSelected(selection: any, row: Column) {
-  console.log("onTableRowSelected");
   selectedRows.value = selection;
 }
 
@@ -277,7 +276,7 @@ async function copyDDl() {
   await navigator.clipboard.writeText(sql.value);
   ElNotification({
     type: "success",
-    message: "复制完成！",
+    message: "复制成功！",
     position: "top-right"
   });
 }
