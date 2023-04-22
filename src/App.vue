@@ -472,7 +472,6 @@ async function columnEnNameChange(name: string, row: Column) {
 
 .row>.input {
   width: 300px;
-  ;
   display: flex;
   align-items: center;
   justify-content: left;
