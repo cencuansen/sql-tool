@@ -81,21 +81,7 @@ const columns = ref<Column[]>([{
   comments: ""
 }]);
 
-const duplicatedColumnEnName = ref(false);
-
 async function addRow() {
-
-  if (duplicatedColumnEnName.value) {
-    nextTick(() => {
-      ElNotification({
-        type: "error",
-        message: "字段名称重复！",
-        position: "top-right"
-      });
-    });
-    return;
-  }
-
   let newColumn = {
     enName: "",
     cnName: "",
@@ -106,15 +92,10 @@ async function addRow() {
     needSort: "false",
     comments: ""
   };
-  // const exiestd = columns.value.find(column => column.enName === newColumn.enName);
-  // if (exiestd) {
-  //   return;
-  // }
   columns.value.push(newColumn);
   scrollBottom();
 }
 
-const tableRef = ref(null);
 const selectedRows = ref<Column[]>([]);
 
 async function onTableRowSelected(selection: any, row: Column) {
@@ -124,10 +105,6 @@ async function onTableRowSelected(selection: any, row: Column) {
 async function removeSelectedRows() {
   columns.value = columns.value.filter((column: Column) => !selectedRows.value.find(selected => selected === column));
   selectedRows.value = [];
-}
-
-function scrollTop() {
-  nextTick(() => { document.documentElement.scrollTop = 0; })
 }
 
 function scrollBottom() {
@@ -165,27 +142,31 @@ function generateDDL() {
         message: "已过滤掉无效数据！",
         position: "top-right"
       });
-    })
+    });
   }
   columns.value = valideColumns;
 
-  // 表名称验证
-  if (setting.value.enName === "" || setting.value.enName === null) {
+  let map = new Map<string, Column>();
+  for (let i = columns.value.length - 1; i >= 0; i--) {
+    map.set(columns.value[i].enName, columns.value[i]);
+  }
+  const distincted = Array.from(map.keys());
+  if (distincted.length < columns.value.length) {
     nextTick(() => {
       ElNotification({
-        type: "error",
-        message: "表英文名称不能为空！",
+        type: "success",
+        message: "已过滤掉重复数据！",
         position: "top-right"
       });
     });
-    return;
   }
+  columns.value = Array.from(map.values()).reverse();
 
   if (columns.value.length === 0) {
     nextTick(() => {
       ElNotification({
         type: "error",
-        message: "无效数据，请完善列信息后再试！",
+        message: "数据为空！",
         position: "top-right"
       });
     });
@@ -337,12 +318,11 @@ async function columnEnNameChange(name: string, row: Column) {
     nextTick(() => {
       ElNotification({
         type: "error",
-        message: "字段名称重复！",
+        message: "字段已存在！",
         position: "top-right"
       });
     });
   }
-  duplicatedColumnEnName.value = true;
 }
 
 </script>
